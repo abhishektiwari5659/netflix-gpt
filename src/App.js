@@ -1,9 +1,9 @@
-
+import Body from "./components/Body"
 
 function App() {
   return (
     <div className="App">
-      <h1 className="p-4 bg-emerald-400">hello??</h1>
+      <Body> </Body>
     </div>
   );
 }
