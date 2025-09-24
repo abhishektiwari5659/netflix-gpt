@@ -32,7 +32,7 @@ const Login = () => {
                         // Profile updated!
                         const { uid, email, displayName } = auth.currentUser;
                         dispatch(addUser({ uid: uid, email: email, displayName: displayName }))
-                        navigate("/browse")
+                       
                     }).catch((error) => {
                         // An error occurred
                         // ...
@@ -52,7 +52,6 @@ const Login = () => {
                     // Signed in 
                     const user = userCredential.user;
                     console.log(user)
-                    navigate("/browse")
                     // ...
                 })
                 .catch((error) => {
