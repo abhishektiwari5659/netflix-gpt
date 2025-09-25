@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { addUser, removeUser } from "../utils/userSlice";
 import { LOGO, USER_LOGO } from "../utils/constants";
+import { toggleGpt } from "../utils/gptSlice";
 
 const Header = () => {
   const dispatch = useDispatch()
@@ -34,6 +35,10 @@ const Header = () => {
   navigate("/error")
 });
   }
+
+  const handleGPT = () => {
+    dispatch(toggleGpt());
+  }
   return (
     <div className="absolute w-screen px-8 py-2 bg-gradient-to-b from-black z-10 flex justify-between">
       <img 
@@ -42,7 +47,8 @@ const Header = () => {
         className="w-40"
       />
       {user && <div className="flex">
-        <img className="w-12 h-12 mx-4" src={USER_LOGO} alt="user-logo" />
+        <button className="bg-[#e50914] rounded-lg py-2 px-2 mx-4" onClick={handleGPT}>Get what you like</button>
+        <img className="w-10 h-10 rounded cursor-pointer border-2 border-transparent hover:border-white transition duration-300" src={USER_LOGO} alt="user-logo" />
         <button onClick={doSignOut} className="text-white font-bold"> Sign Out</button>
       </div>}
     </div>
