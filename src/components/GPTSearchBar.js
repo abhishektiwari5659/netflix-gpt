@@ -1,73 +1,74 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import langConstants from "../utils/langConstants";
 import { useRef } from "react";
 import client from "../utils/openAI";
-import {API_OPTIONS} from "../utils/constants"
+import { API_OPTIONS } from "../utils/constants";
+import { addMovieResult } from "../utils/gptSlice";
 
 const GPTSearchBar = () => {
+  const dispatch = useDispatch();
   const selectedLang = useSelector((store) => store.config.lang);
   const searchText = useRef(null);
 
   const fetchMovieTMDB = async (movie) => {
-  try {
-    const data = await fetch(
-      `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(
-        movie
-      )}&include_adult=false&language=en-US&page=1`,
-      API_OPTIONS
-    );
-    const json = await data.json();
+    try {
+      const data = await fetch(
+        `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(
+          movie
+        )}&include_adult=false&language=en-US&page=1`,
+        API_OPTIONS
+      );
+      const json = await data.json();
 
-    if (!json.results || json.results.length === 0) return null;
+      if (!json.results || json.results.length === 0) return null;
 
-    // Try to find exact match (case-insensitive)
-    const exactMatch = json.results.find(
-      (res) => res.title.toLowerCase() === movie.toLowerCase()
-    );
+      // Try to find exact match (case-insensitive)
+      const exactMatch = json.results.find(
+        (res) => res.title.toLowerCase() === movie.toLowerCase()
+      );
 
-    // Return exact match or fallback to first result
-    return exactMatch || json.results[0];
-  } catch (err) {
-    console.error(`TMDB fetch error for "${movie}":`, err);
-    return null;
-  }
-};
-
+      return exactMatch || json.results[0];
+    } catch (err) {
+      console.error(`TMDB fetch error for "${movie}":`, err);
+      return null;
+    }
+  };
 
   const getResults = async () => {
-  let moviesArray = [];
+    let moviesArray = [];
+    let rawTextLocal = ""; // fix: avoid redeclaration
 
-  try {
-    const model = client.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const gptQuery =
-      "Act as a Netflix Movie Recommendation system and suggest movies for the query " +
-      searchText.current.value +
-      ". Only give me names of the popular movies.";
+    try {
+      const model = client.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const gptQuery =
+        "Act as a Netflix Movie Recommendation system and suggest movies for the query " +
+        searchText.current.value +
+        ". Only give me names of the popular movies.";
 
-    const result = await model.generateContent(gptQuery);
+      const result = await model.generateContent(gptQuery);
 
-    const rawText = result.response.candidates[0].content.parts[0].text;
+      rawTextLocal = result.response.candidates[0].content.parts[0].text;
 
-    moviesArray = rawText
-      .split(/\n|,/)              
-      .map((m) => m.replace(/^\*+/, "").trim())
-      .filter(Boolean);
+      moviesArray = rawTextLocal
+        .split(/\n|,/)              
+        .map((m) => m.replace(/^\*+/, "").trim())
+        .filter(Boolean);
 
-    console.log("Movie names array:", moviesArray);
-  } catch (err) {
-    console.error("Gemini Error:", err);
-  }
+      console.log("Movie names array:", moviesArray);
+    } catch (err) {
+      console.error("Gemini Error:", err);
+    }
 
-  // Fetch TMDB data for all movies
-  const promiseArray = moviesArray.map((movie) => fetchMovieTMDB(movie));
-  const tmdbResult = await Promise.all(promiseArray);
+    // Fetch TMDB data for all movies
+    const promiseArray = moviesArray.map((movie) => fetchMovieTMDB(movie));
+    const tmdbResult = await Promise.all(promiseArray);
 
-  // Remove null results if TMDB returned nothing
-  const finalMovies = tmdbResult.filter(Boolean);
-  console.log("Final TMDB results (exact match or fallback):", finalMovies);
-};
+    const finalMovies = tmdbResult.filter(Boolean);
+    console.log("Final TMDB results:", finalMovies);
 
-
+    // Dispatch with correct property names
+    dispatch(addMovieResult({ movieNames: rawTextLocal, movieResults: finalMovies }));
+  };
 
   return (
     <div className="pt-[10%] flex justify-center">
