@@ -23,7 +23,7 @@ const Browse = () => {
   useIndianMovies();
 
   return (
-    <div className="text-white min-h-screen">
+    <div className="text-white min-h-screen bg-black">
       <Header />
       {
         showGptSearch ? <SearchGPT /> : 
