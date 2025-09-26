@@ -1,12 +1,13 @@
 import { useEffect } from 'react';
 import { API_OPTIONS } from '../utils/constants';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addHorrorMovies } from '../utils/movieSlice';
 
 const HORROR_GENRE_ID = 27; // TMDB genre ID for Horror
 
 const useHorrorMovies = () => {
   const dispatch = useDispatch();
+  const horrorMovies = useSelector(store => store.movies.horrorMovies)
 
   const getHorrorMovies = async () => {
     try {
@@ -19,7 +20,8 @@ const useHorrorMovies = () => {
   };
 
   useEffect(() => {
-    getHorrorMovies();
+
+   !horrorMovies && getHorrorMovies();
   }, []);
 };
 

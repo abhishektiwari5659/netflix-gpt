@@ -1,11 +1,12 @@
 import { useEffect } from 'react';
 import { API_OPTIONS } from '../utils/constants';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addComedyMovies } from '../utils/movieSlice';
 
 const COMEDY_GENRE_ID = 35; // TMDB genre ID for Comedy
 
 const useComedyMovies = () => {
+  const comedyMovies = useSelector(store => store.movies.comedyMovies)
   const dispatch = useDispatch();
 
   const getComedyMovies = async () => {
@@ -19,7 +20,7 @@ const useComedyMovies = () => {
   };
 
   useEffect(() => {
-    getComedyMovies();
+    !comedyMovies && getComedyMovies();
   }, []);
 };
 

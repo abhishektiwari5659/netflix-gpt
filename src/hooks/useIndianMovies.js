@@ -1,10 +1,11 @@
 import { useEffect } from 'react';
 import { API_OPTIONS } from '../utils/constants';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addIndianMovies } from '../utils/movieSlice';
 
 const useIndianMovies = () => {
   const dispatch = useDispatch();
+  const indianMovies = useSelector(store => store.movies.indianMovies)
 
   const getIndianMovies = async () => {
     try {
@@ -20,7 +21,7 @@ const useIndianMovies = () => {
   };
 
   useEffect(() => {
-    getIndianMovies();
+    !indianMovies && getIndianMovies();
   }, []);
 };
 

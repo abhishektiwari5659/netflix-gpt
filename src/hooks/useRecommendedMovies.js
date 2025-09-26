@@ -1,10 +1,11 @@
 import { useEffect } from 'react';
 import { API_OPTIONS } from '../utils/constants';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addRecommendedMovies } from '../utils/movieSlice';
 
 const useRecommendedMovies = () => {
   const dispatch = useDispatch();
+  const recommendedMovies = useSelector(store => store.movies.recommendedMovies)
 
   const getRecommendedMovies = async () => {
     try {
@@ -17,7 +18,7 @@ const useRecommendedMovies = () => {
   };
 
   useEffect(() => {
-    getRecommendedMovies();
+    !recommendedMovies && getRecommendedMovies();
   }, []);
 };
 
