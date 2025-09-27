@@ -7,7 +7,7 @@ import { addUser, removeUser } from "../utils/userSlice";
 import { LOGO, SUPPORTED_LANG, USER_LOGO } from "../utils/constants";
 import { toggleGpt } from "../utils/gptSlice";
 import { changeLang } from "../utils/congifSlice";
-import { Menu, X } from "lucide-react"; // ✅ clean icons
+import { Menu, X } from "lucide-react";
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -16,12 +16,16 @@ const Header = () => {
   const user = useSelector((store) => store.user);
   const showGpt = useSelector((store) => store.gpt.showGpt);
 
+  // Auth listener
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         const { uid, email, displayName, photoURL } = user;
         dispatch(addUser({ uid, email, displayName, photoURL }));
-        navigate("/browse");
+
+        if (window.location.pathname === "/") {
+          navigate("/browse");
+        }
       } else {
         dispatch(removeUser());
         navigate("/");
@@ -31,14 +35,23 @@ const Header = () => {
     return () => unsubscribe();
   }, [auth, dispatch, navigate]);
 
+  // Sign out
   const doSignOut = () => {
     signOut(auth).catch(() => navigate("/error"));
   };
 
+  // GPT toggle
   const handleGPT = () => {
     dispatch(toggleGpt());
+
+    // Ensure GPT works on Browse, Anime, Series
+    const path = window.location.pathname;
+    if (path !== "/browse" && path !== "/anime" && path !== "/series") {
+      navigate("/browse");
+    }
   };
 
+  // Language change
   const langChange = (e) => {
     dispatch(changeLang(e.target.value));
   };
@@ -50,11 +63,19 @@ const Header = () => {
         src={LOGO}
         alt="Netflix Logo"
         className="w-24 sm:w-32 md:w-40 cursor-pointer"
+        onClick={() => navigate("/browse")}
       />
 
       {/* Desktop Nav */}
       {user && (
-        <div className="hidden md:flex items-center space-x-4">
+        <div className="hidden md:flex items-center space-x-6">
+          <button onClick={() => navigate("/series")} className="text-white hover:text-red-500">
+            Series
+          </button>
+          <button onClick={() => navigate("/anime")} className="text-white hover:text-red-500">
+            Anime
+          </button>
+
           {showGpt && (
             <select
               className="p-2 bg-[#e50914] text-white rounded"
@@ -102,6 +123,19 @@ const Header = () => {
       {/* Mobile Dropdown */}
       {menuOpen && (
         <div className="absolute top-16 right-4 bg-black bg-opacity-90 rounded-lg shadow-lg p-4 flex flex-col space-y-3 w-48 md:hidden">
+          <button
+            onClick={() => { navigate("/series"); setMenuOpen(false); }}
+            className="text-white hover:text-red-500"
+          >
+            Series
+          </button>
+          <button
+            onClick={() => { navigate("/anime"); setMenuOpen(false); }}
+            className="text-white hover:text-red-500"
+          >
+            Anime
+          </button>
+
           {showGpt && (
             <select
               className="p-2 bg-[#e50914] text-white rounded"

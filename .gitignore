@@ -12,6 +12,7 @@
 /build
 /src/utils/firebase.js
 /src/utils/geminikey.js
+.env
 
 # misc
 .DS_Store

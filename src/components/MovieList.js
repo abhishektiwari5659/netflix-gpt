@@ -1,6 +1,6 @@
 import MovieCard from "./MovieCard";
 
-const MovieList = ({ title, movies }) => {
+const MovieList = ({ title, movies, onMovieSelect }) => {
   if (!movies || movies.length === 0) return null;
 
   return (
@@ -9,14 +9,23 @@ const MovieList = ({ title, movies }) => {
       <div className="flex overflow-x-auto no-scrollbar">
         <div className="flex gap-4">
           {movies.map((movie, index) => {
-            if (!movie) return null; // <-- skip undefined entries
+            if (!movie) return null;
 
             return (
-              <div key={movie.id || movie.title || index} className="flex flex-col items-center">
+              <div
+                key={movie.id || movie.title || index}
+                className="flex flex-col items-center"
+              >
                 {movie.poster_path ? (
-                  <MovieCard posterPath={movie.poster_path} />
+                  <MovieCard
+                    posterPath={movie.poster_path}
+                    onClick={() => onMovieSelect(movie.id)}
+                  />
                 ) : (
-                  <div className="w-48 h-72 bg-gray-700 flex items-center justify-center rounded-lg">
+                  <div
+                    className="w-48 h-72 bg-gray-700 flex items-center justify-center rounded-lg cursor-pointer"
+                    onClick={() => onMovieSelect(movie.id)}
+                  >
                     <span className="text-center p-2">{movie.title}</span>
                   </div>
                 )}

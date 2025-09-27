@@ -1,7 +1,7 @@
 import GPTSearchBar from "./GPTSearchBar";
 import GPTMovieSuggestion from "./GPTMovieSuggestion";
 
-const SearchGPT = () => {
+const SearchGPT = ({onMovieSelect }) => {
   return (
     <div
       className="relative w-full min-h-screen bg-cover bg-center bg-fixed"
@@ -20,7 +20,7 @@ const SearchGPT = () => {
         </div>
 
         <div className="w-full max-w-6xl mt-12 sm:mt-16">
-          <GPTMovieSuggestion />
+          <GPTMovieSuggestion onMovieSelect={onMovieSelect}/>
         </div>
       </div>
     </div>

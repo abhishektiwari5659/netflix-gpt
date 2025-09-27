@@ -11,6 +11,11 @@ const movieSlice = createSlice({
     upcomingMovies: null,
     trailerVideo: null,
     indianMovies:null,
+     anime: null, 
+    series: null,
+    japaneseAnime: null,
+    dubbedAnime: null,
+    americanAnime: null,
   },
   reducers: {
     addNowPlayingMovies: (state, action) => {
@@ -37,7 +42,21 @@ const movieSlice = createSlice({
     addIndianMovies: (state, action) => {
       state.indianMovies = action.payload;
     },
-
+    addAnime: (state, action) => {
+      state.anime = action.payload;
+    },
+    addSeries: (state, action) => {
+      state.series = action.payload;
+    },
+    addJapaneseAnime: (state, action) => {
+      state.japaneseAnime = action.payload;
+    },
+    addDubbedAnime: (state, action) => {
+      state.dubbedAnime = action.payload;
+    },
+    addAmericanAnime: (state, action) => {
+      state.americanAnime = action.payload;
+    },
   },
 });
 
@@ -50,6 +69,11 @@ export const {
   addUpcomingMovies,
   addTrailerVideo,
   addIndianMovies,
+  addAnime,
+  addSeries,
+  addJapaneseAnime,
+  addDubbedAnime, 
+  addAmericanAnime 
 } = movieSlice.actions;
 
 export default movieSlice.reducer;

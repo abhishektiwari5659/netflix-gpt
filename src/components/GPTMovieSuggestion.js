@@ -2,13 +2,11 @@ import React from "react";
 import { useSelector } from "react-redux";
 import MovieList from "./MovieList";
 
-const GPTMovieSuggestion = () => {
+const GPTMovieSuggestion = ({ onMovieSelect }) => { // <- accept handler
   const { movieNames, movieResults } = useSelector((store) => store.gpt);
 
-  // Return nothing if we don't have movies or names
   if (!movieNames || movieNames.length === 0 || !movieResults) return null;
 
-  // Clean names (remove leading * and extra spaces)
   const cleanNames = movieNames.map((name) => name.replace(/^\*+/, "").trim());
 
   return (
@@ -19,6 +17,7 @@ const GPTMovieSuggestion = () => {
             key={movieName}
             title={movieName}
             movies={Array.isArray(movieResults[index]) ? movieResults[index] : [movieResults[index]]}
+            onMovieSelect={onMovieSelect} // <- pass it here
           />
         ))}
       </div>
