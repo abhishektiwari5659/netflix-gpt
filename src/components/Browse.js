@@ -1,10 +1,10 @@
 import { useState } from "react";
+import { useSelector } from 'react-redux';
 import Header from './Header';
 import MainContainer from './MainContainer';
 import SecondaryContainer from './SecondaryContainer';
 import SearchGPT from "./SearchGPT";
 import MovieDetail from './MovieDetail';
-import { useSelector } from 'react-redux';
 
 import useNowPlayingMovies from '../hooks/useNowPlayingMovies';
 import useTrendingMovies from '../hooks/useTrendingMovies';
@@ -17,6 +17,7 @@ import useIndianMovies from "../hooks/useIndianMovies";
 const Browse = () => {
   const showGptSearch = useSelector(store => store.gpt.showGpt);
   const [selectedMovieId, setSelectedMovieId] = useState(null);
+  const [selectedType, setSelectedType] = useState("movie");
 
   // Fetch hooks
   useNowPlayingMovies();
@@ -32,13 +33,30 @@ const Browse = () => {
       <Header />
 
       {showGptSearch ? (
-        <SearchGPT onMovieSelect={setSelectedMovieId} />
+        <SearchGPT onMovieSelect={(id, type) => {
+          setSelectedMovieId(id);
+          setSelectedType(type);
+        }} />
       ) : selectedMovieId ? (
-        <MovieDetail movieId={selectedMovieId} onBack={() => setSelectedMovieId(null)} />
+        <MovieDetail
+          movieId={selectedMovieId}
+          type={selectedType}
+          onBack={() => setSelectedMovieId(null)}
+          onSelectMovie={(id, type) => {
+            setSelectedMovieId(id);
+            setSelectedType(type);
+          }}
+        />
       ) : (
         <>
-          <MainContainer onMovieSelect={setSelectedMovieId} />
-          <SecondaryContainer onMovieSelect={setSelectedMovieId} />
+          <MainContainer onMovieSelect={(id, type = "movie") => {
+            setSelectedMovieId(id);
+            setSelectedType(type);
+          }} />
+          <SecondaryContainer onMovieSelect={(id, type = "movie") => {
+            setSelectedMovieId(id);
+            setSelectedType(type);
+          }} />
         </>
       )}
     </div>

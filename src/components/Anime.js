@@ -10,8 +10,7 @@ import { BsInfoCircle } from "react-icons/bs";
 import SearchGPT from "./SearchGPT";
 import MovieDetail from "./MovieDetail";
 import MovieCard from "./MovieCard";
-
-const IMG_CDN = "https://image.tmdb.org/t/p/original";
+import { API_OPTIONS, IMG_CDN } from "../utils/constants";
 
 const Anime = () => {
   const anime = useSelector((store) => store.movies.anime);
@@ -26,12 +25,33 @@ const Anime = () => {
   useAmericanAnime();
 
   const [featuredAnime, setFeaturedAnime] = useState(null);
+  const [trailerKey, setTrailerKey] = useState(null);
   const [selectedMovieId, setSelectedMovieId] = useState(null);
 
   useEffect(() => {
     if (anime && anime.length > 0) {
       const random = anime[Math.floor(Math.random() * anime.length)];
       setFeaturedAnime(random);
+
+      const fetchTrailer = async () => {
+        try {
+          const res = await fetch(
+            `https://api.themoviedb.org/3/tv/${random.id}/videos`,
+            API_OPTIONS
+          );
+          const data = await res.json();
+          let trailer = data.results.find(
+            (vid) => vid.type === "Trailer" && vid.site === "YouTube"
+          );
+          if (!trailer && data.results.length > 0) {
+            trailer = data.results.find((vid) => vid.site === "YouTube");
+          }
+          if (trailer) setTrailerKey(trailer.key);
+        } catch (err) {
+          console.error(err);
+        }
+      };
+      fetchTrailer();
     }
   }, [anime]);
 
@@ -42,17 +62,36 @@ const Anime = () => {
       {showGptSearch ? (
         <SearchGPT onMovieSelect={setSelectedMovieId} />
       ) : selectedMovieId ? (
-        <MovieDetail movieId={selectedMovieId} onBack={() => setSelectedMovieId(null)} />
+        <MovieDetail
+          type="tv"
+          movieId={selectedMovieId}
+          onBack={() => setSelectedMovieId(null)}
+          onSelectMovie={(id) => setSelectedMovieId(id)}
+        />
       ) : (
         <>
           {/* Hero Section */}
           {featuredAnime && (
-            <div
-              className="relative h-[60vh] sm:h-[70vh] md:h-[80vh] w-full bg-cover bg-center"
-              style={{ backgroundImage: `url(${IMG_CDN}${featuredAnime.backdrop_path})` }}
-            >
+            <div className="relative h-[60vh] sm:h-[70vh] md:h-[80vh] w-full">
+              {trailerKey ? (
+                <iframe
+                  title="Trailer"
+                  src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=1&controls=1&loop=1&playlist=${trailerKey}`}
+                  className="absolute w-full h-full object-cover"
+                  frameBorder="0"
+                  allow="autoplay; encrypted-media"
+                  allowFullScreen
+                />
+              ) : (
+                <div
+                  className="absolute w-full h-full bg-cover bg-center"
+                  style={{
+                    backgroundImage: `url(${IMG_CDN}${featuredAnime.backdrop_path})`,
+                  }}
+                ></div>
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black"></div>
-              <div className="absolute bottom-10 sm:bottom-16 md:bottom-20 left-4 sm:left-10 max-w-full sm:max-w-xl px-2 sm:px-0">
+              <div className="absolute bottom-10 sm:bottom-16 md:bottom-20 left-4 sm:left-10 max-w-full sm:max-w-xl px-2 sm:px-0 z-20">
                 <h1 className="text-2xl sm:text-4xl md:text-6xl font-bold mb-2 sm:mb-4 line-clamp-2">
                   {featuredAnime.name || featuredAnime.title}
                 </h1>
@@ -74,61 +113,27 @@ const Anime = () => {
           )}
 
           {/* Rows */}
-          <div className="p-4 sm:p-6">
-            <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-4">Popular Anime</h2>
-            <div className="flex gap-2 sm:gap-4 overflow-x-scroll scrollbar-hide">
-              {anime?.map((item) => (
-                <MovieCard
-                  key={item.id}
-                  posterPath={item.poster_path}
-                  onClick={() => setSelectedMovieId(item.id)}
-                />
-
-              ))}
+          {[
+            { title: "Popular Anime", list: anime },
+            { title: "Japanese Anime", list: japaneseAnime },
+            { title: "Dubbed Anime", list: dubbedAnime },
+            { title: "American Anime", list: americanAnime },
+          ].map((row) => (
+            <div key={row.title} className="p-4 sm:p-6">
+              <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-4">
+                {row.title}
+              </h2>
+              <div className="flex gap-2 sm:gap-4 overflow-x-auto scrollbar-hide">
+                {row.list?.map((item) => (
+                  <MovieCard
+                    key={item.id}
+                    posterPath={item.poster_path}
+                    onClick={() => setSelectedMovieId(item.id)}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-
-          <div className="p-4 sm:p-6">
-            <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-4">Japanese Anime</h2>
-            <div className="flex gap-2 sm:gap-4 overflow-x-scroll scrollbar-hide">
-              {japaneseAnime?.map((item) => (
-                <MovieCard
-                  key={item.id}
-                  posterPath={item.poster_path}
-                  onClick={() => setSelectedMovieId(item.id)}
-                />
-
-              ))}
-            </div>
-          </div>
-
-          <div className="p-4 sm:p-6">
-            <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-4">Dubbed Anime</h2>
-            <div className="flex gap-2 sm:gap-4 overflow-x-scroll scrollbar-hide">
-              {dubbedAnime?.map((item) => (
-                <MovieCard
-                  key={item.id}
-                  posterPath={item.poster_path}
-                  onClick={() => setSelectedMovieId(item.id)}
-                />
-
-              ))}
-            </div>
-          </div>
-
-          <div className="p-4 sm:p-6">
-            <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-4">American Anime</h2>
-            <div className="flex gap-2 sm:gap-4 overflow-x-scroll scrollbar-hide">
-              {americanAnime?.map((item) => (
-                <MovieCard
-                  key={item.id}
-                  posterPath={item.poster_path}
-                  onClick={() => setSelectedMovieId(item.id)}
-                />
-
-              ))}
-            </div>
-          </div>
+          ))}
         </>
       )}
     </div>

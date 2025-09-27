@@ -16,6 +16,7 @@ const movieSlice = createSlice({
     japaneseAnime: null,
     dubbedAnime: null,
     americanAnime: null,
+    seriesCategories: {},
   },
   reducers: {
     addNowPlayingMovies: (state, action) => {
@@ -57,6 +58,10 @@ const movieSlice = createSlice({
     addAmericanAnime: (state, action) => {
       state.americanAnime = action.payload;
     },
+    addSeriesCategory: (state, action) => {
+  const { category, series } = action.payload;
+  state.seriesCategories[category] = series;
+},
   },
 });
 
@@ -73,7 +78,8 @@ export const {
   addSeries,
   addJapaneseAnime,
   addDubbedAnime, 
-  addAmericanAnime 
+  addAmericanAnime,
+  addSeriesCategory
 } = movieSlice.actions;
 
 export default movieSlice.reducer;

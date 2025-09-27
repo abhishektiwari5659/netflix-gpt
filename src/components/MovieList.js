@@ -1,6 +1,6 @@
 import MovieCard from "./MovieCard";
 
-const MovieList = ({ title, movies, onMovieSelect }) => {
+const MovieList = ({ title, movies, onMovieSelect, type = "movie" }) => {
   if (!movies || movies.length === 0) return null;
 
   return (
@@ -19,12 +19,12 @@ const MovieList = ({ title, movies, onMovieSelect }) => {
                 {movie.poster_path ? (
                   <MovieCard
                     posterPath={movie.poster_path}
-                    onClick={() => onMovieSelect(movie.id)}
+                    onClick={() => onMovieSelect(movie.id, type)}
                   />
                 ) : (
                   <div
                     className="w-48 h-72 bg-gray-700 flex items-center justify-center rounded-lg cursor-pointer"
-                    onClick={() => onMovieSelect(movie.id)}
+                    onClick={() => onMovieSelect(movie.id, type)}
                   >
                     <span className="text-center p-2">{movie.title}</span>
                   </div>
