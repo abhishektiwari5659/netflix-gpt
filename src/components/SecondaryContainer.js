@@ -4,29 +4,44 @@ import MovieList from "./MovieList";
 const SecondaryContainer = ({ onMovieSelect }) => {
   const movies = useSelector((store) => store.movies);
 
-  if (!movies) return null;
-
-  const movieRows = [
-    { title: "Now Playing", list: movies.nowPlayingMovies },
-    { title: "Indian Movies", list: movies.indianMovies },
-    { title: "Trending", list: movies.trendingMovies },
-    { title: "For You", list: movies.recommendedMovies },
-    { title: "Comedy", list: movies.comedyMovies },
-    { title: "Horror", list: movies.horrorMovies },
-    { title: "Upcoming Movies", list: movies.upcomingMovies },
-  ];
-
   return (
-    <div className="bg-black w-full">
-      <div className="px-4 sm:px-6 md:px-10 lg:px-16 xl:px-24 py-6 sm:py-8 md:py-10 lg:py-8 xl:py-6 space-y-6">
-        {movieRows.map((row) => (
-          <MovieList
-            key={row.title}
-            title={row.title}
-            movies={row.list}
-            onMovieSelect={onMovieSelect}
-          />
-        ))}
+    <div className="bg-black">
+      <div className="mt-[40%] md:-mt-60 pl-6 md:pl-12 z-20 relative space-y-4 md:space-y-6">
+        <MovieList
+          title="Now Playing"
+          movies={movies.nowPlayingMovies}
+          onMovieSelect={onMovieSelect}
+        />
+        <MovieList
+          title="Indian Movies"
+          movies={movies.indianMovies}
+          onMovieSelect={onMovieSelect}
+        />
+        <MovieList
+          title="Trending"
+          movies={movies.trendingMovies}
+          onMovieSelect={onMovieSelect}
+        />
+        <MovieList
+          title="For You"
+          movies={movies.recommendedMovies}
+          onMovieSelect={onMovieSelect}
+        />
+        <MovieList
+          title="Comedy"
+          movies={movies.comedyMovies}
+          onMovieSelect={onMovieSelect}
+        />
+        <MovieList
+          title="Horror"
+          movies={movies.horrorMovies}
+          onMovieSelect={onMovieSelect}
+        />
+        <MovieList
+          title="Upcoming Movies"
+          movies={movies.upcomingMovies}
+          onMovieSelect={onMovieSelect}
+        />
       </div>
     </div>
   );
