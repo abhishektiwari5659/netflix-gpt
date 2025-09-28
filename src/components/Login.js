@@ -9,7 +9,7 @@ import { addUser } from "../utils/userSlice";
 
 const Login = () => {
   const [isSignIn, setIsSignIn] = useState(true);
-  const [errMsg, setErrMsg] = useState(null);
+  const [errMsg, setErrMsg] = useState([]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const name = useRef();
@@ -17,42 +17,37 @@ const Login = () => {
   const password = useRef(null);
 
   const handleBtn = () => {
-    const message = checkValid(email.current.value, password.current.value);
-    setErrMsg(message);
-    if (message) return;
+    const messages = checkValid(email.current.value, password.current.value);
+    setErrMsg(messages || []);
+    if (messages) return;
 
     if (!isSignIn) {
+      // Sign Up
       createUserWithEmailAndPassword(auth, email.current.value, password.current.value)
         .then((userCredential) => {
           const user = userCredential.user;
-          updateProfile(user, {
-            displayName: name.current.value,
-          })
+          updateProfile(user, { displayName: name.current.value })
             .then(() => {
               const { uid, email, displayName } = auth.currentUser;
               dispatch(addUser({ uid, email, displayName }));
+              navigate("/"); // redirect after signup
             })
-            .catch((error) => {
-              console.error(error);
-            });
+            .catch(console.error);
         })
         .catch((error) => {
-          setErrMsg(error.code + " - " + error.message);
+          setErrMsg([error.message]);
         });
     } else {
+      // Sign In
       signInWithEmailAndPassword(auth, email.current.value, password.current.value)
-        .then((userCredential) => {
-          const user = userCredential.user;
-        })
-        .catch((error) => {
-          setErrMsg(error.code + " - " + error.message);
-        });
+        .then(() => navigate("/"))
+        .catch((error) => setErrMsg([error.message]));
     }
   };
 
   const toggleForm = () => {
     setIsSignIn(!isSignIn);
-    setErrMsg(null);
+    setErrMsg([]);
   };
 
   return (
@@ -71,7 +66,10 @@ const Login = () => {
           onSubmit={(e) => e.preventDefault()}
           className="w-full max-w-md bg-black bg-opacity-90 p-8 sm:p-10 rounded-lg text-white flex flex-col"
         >
-          <h1 className="text-3xl sm:text-4xl font-bold mb-6 text-center">{isSignIn ? "Sign In" : "Sign Up"}</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-6 text-center">
+            {isSignIn ? "Sign In" : "Sign Up"}
+          </h1>
+
           {!isSignIn && (
             <input
               ref={name}
@@ -80,30 +78,45 @@ const Login = () => {
               className="p-4 mb-4 w-full bg-gray-800 rounded focus:outline-none focus:ring-2 focus:ring-[#e50914]"
             />
           )}
+
           <input
             ref={email}
             type="email"
             placeholder="Enter Email"
             className="p-4 mb-4 w-full bg-gray-800 rounded focus:outline-none focus:ring-2 focus:ring-[#e50914]"
           />
+
           <input
             ref={password}
             type="password"
             placeholder="Enter Password"
-            className="p-4 mb-4 w-full bg-gray-800 rounded focus:outline-none focus:ring-2 focus:ring-[#e50914]"
+            className="p-4 mb-2 w-full bg-gray-800 rounded focus:outline-none focus:ring-2 focus:ring-[#e50914]"
           />
-          {errMsg && <p className="text-[#e50914] font-semibold mb-4 text-center">{errMsg}</p>}
+
+          {/* Display validation messages as checklist */}
+          {errMsg.length > 0 && (
+            <ul className="text-[#e50914] mb-4 list-disc list-inside text-sm sm:text-base">
+              {errMsg.map((msg, idx) => (
+                <li key={idx}>{msg}</li>
+              ))}
+            </ul>
+          )}
+
           <button
             onClick={handleBtn}
             className="w-full py-3 sm:py-4 bg-[#e50914] rounded-lg font-semibold hover:bg-red-700 transition mb-4"
           >
             {isSignIn ? "Sign In" : "Sign Up"}
           </button>
+
           <p className="text-center text-sm sm:text-base">
             {isSignIn ? (
               <>
                 New to Netflix-GPT?{" "}
-                <span className="cursor-pointer text-white font-bold hover:underline" onClick={toggleForm}>
+                <span
+                  className="cursor-pointer text-white font-bold hover:underline"
+                  onClick={toggleForm}
+                >
                   Sign Up
                 </span>{" "}
                 now
@@ -111,7 +124,10 @@ const Login = () => {
             ) : (
               <>
                 Already a user?{" "}
-                <span className="cursor-pointer text-white font-bold hover:underline" onClick={toggleForm}>
+                <span
+                  className="cursor-pointer text-white font-bold hover:underline"
+                  onClick={toggleForm}
+                >
                   Sign In
                 </span>
               </>
