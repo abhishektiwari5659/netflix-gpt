@@ -30,7 +30,7 @@ const Login = () => {
             .then(() => {
               const { uid, email, displayName } = auth.currentUser;
               dispatch(addUser({ uid, email, displayName }));
-              navigate("/"); // redirect after signup
+              navigate("/browse"); // redirect after signup
             })
             .catch(console.error);
         })
@@ -40,7 +40,7 @@ const Login = () => {
     } else {
       // Sign In
       signInWithEmailAndPassword(auth, email.current.value, password.current.value)
-        .then(() => navigate("/"))
+        .then(() => navigate("/browse"))
         .catch((error) => setErrMsg([error.message]));
     }
   };
