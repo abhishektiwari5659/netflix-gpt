@@ -9,7 +9,7 @@ const GPTSearchBar = () => {
   const dispatch = useDispatch();
   const selectedLang = useSelector((store) => store.config.lang);
   const searchText = useRef(null);
-  const [loading, setLoading] = useState(false); // loading state
+  const [loading, setLoading] = useState(false);
 
   const fetchMovieTMDB = async (movie) => {
     try {
@@ -22,59 +22,67 @@ const GPTSearchBar = () => {
       const json = await data.json();
       if (!json.results || json.results.length === 0) return null;
 
+      // find closest match
       const exactMatch = json.results.find(
         (res) => res.title.toLowerCase() === movie.toLowerCase()
       );
+      const pickedMovie = exactMatch || json.results[0];
 
-      return exactMatch || json.results[0];
+      // ✅ filter out if no poster available
+      if (!pickedMovie.poster_path) return null;
+
+      return pickedMovie;
     } catch (err) {
       console.error(`TMDB fetch error for "${movie}":`, err);
       return null;
     }
   };
 
+  const cleanMovieNames = (rawText) => {
+    return rawText
+      .split(/\n|,/) // split by line or comma
+      .map((m) =>
+        m
+          .replace(/^\d+\.\s*/, "") // remove leading numbering like "1. "
+          .replace(/^\*+|\*+$/g, "") // remove asterisks
+          .replace(/\*\*/g, "") // remove bold markers
+          .trim()
+      )
+      .filter(
+        (m) =>
+          m.length > 0 &&
+          m.length < 50 && // reasonable title length
+          !/^(here|certainly|of course|sure|happy)/i.test(m) // remove junk text
+      );
+  };
+
   const getResults = async () => {
-    setLoading(true); // start loading
+    setLoading(true);
     let moviesArray = [];
-    let rawTextLocal = "";
 
     try {
       const model = client.getGenerativeModel({ model: "gemini-2.5-flash" });
       const gptQuery =
-        "Act as a Netflix Movie Recommendation system and suggest movies for the query " +
+        "Suggest a list of ONLY popular movie titles for the query: " +
         searchText.current.value +
-        ". Only give me names of the popular movies.";
+        ". Just return plain names, no extra text.";
 
       const result = await model.generateContent(gptQuery);
 
-      rawTextLocal = result.response.candidates[0].content.parts[0].text;
+      const rawTextLocal = result.response.candidates[0].content.parts[0].text;
       console.log("Raw Gemini output:", rawTextLocal);
 
-      // Clean the response to extract only movie names
-      moviesArray = rawTextLocal
-        .split(/\n|,/) // split on new lines or commas
-        .map((m) =>
-          m
-            .replace(/^\*+|\*+$/g, "") // remove leading/trailing *
-            .replace(/\*\*/g, "")
-            .trim()
-        )
-        .filter(
-          (m) =>
-            m.length > 0 &&
-            m.length < 50 && // likely movie title
-            !m.toLowerCase().includes("certainly") &&
-            !m.toLowerCase().includes("here are") &&
-            !m.toLowerCase().includes("happy")
-        );
-
+      moviesArray = cleanMovieNames(rawTextLocal);
       console.log("Clean movie names array:", moviesArray);
     } catch (err) {
       console.error("Gemini Error:", err);
     }
 
+    // fetch TMDB results in parallel
     const promiseArray = moviesArray.map((movie) => fetchMovieTMDB(movie));
     const tmdbResult = await Promise.all(promiseArray);
+
+    // ✅ filter out nulls and no-poster results
     const finalMovies = tmdbResult.filter(Boolean);
 
     console.log("Final TMDB results:", finalMovies);
@@ -82,7 +90,7 @@ const GPTSearchBar = () => {
     dispatch(
       addMovieResult({ movieNames: moviesArray, movieResults: finalMovies })
     );
-    setLoading(false); // stop loading
+    setLoading(false);
   };
 
   return (
@@ -106,7 +114,6 @@ const GPTSearchBar = () => {
         </button>
       </form>
 
-      {/* Loading spinner */}
       {loading && (
         <div className="flex flex-col items-center mt-6 text-white">
           <div className="w-12 h-12 border-4 border-t-red-600 border-gray-300 rounded-full animate-spin"></div>
