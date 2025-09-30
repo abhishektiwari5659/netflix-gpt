@@ -10,7 +10,7 @@
 [![Repo Size](https://img.shields.io/github/repo-size/abhishektiwari5659/netflix-gpt)](https://github.com/abhishektiwari5659/netflix-gpt)  
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)  
 
-🔗 **Live Demo:** [Netflix-GPT on Vercel](https://netflix-gpt-self-six.vercel.app)  
+🔗 **Live Demo:** [Netflix-GPT on Vercel](https://moviemate-opal.vercel.app/)  
 
 ---
 
