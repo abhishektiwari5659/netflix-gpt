@@ -26,16 +26,12 @@ const Header = () => {
       if (user) {
         const { uid, email, displayName, photoURL } = user;
         dispatch(addUser({ uid, email, displayName, photoURL }));
-
-        if (window.location.pathname === "/") {
-          navigate("/browse");
-        }
+        if (window.location.pathname === "/") navigate("/browse");
       } else {
         dispatch(removeUser());
         navigate("/");
       }
     });
-
     return () => unsubscribe();
   }, [auth, dispatch, navigate]);
 
@@ -43,9 +39,7 @@ const Header = () => {
   const handleGPT = () => {
     dispatch(toggleGpt());
     const path = window.location.pathname;
-    if (path !== "/browse" && path !== "/anime" && path !== "/series") {
-      navigate("/browse");
-    }
+    if (path !== "/browse" && path !== "/anime" && path !== "/series") navigate("/browse");
   };
   const langChange = (e) => dispatch(changeLang(e.target.value));
 
@@ -75,9 +69,7 @@ const Header = () => {
   // Close search on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (searchRef.current && !searchRef.current.contains(e.target)) {
-        setSearchResults([]);
-      }
+      if (searchRef.current && !searchRef.current.contains(e.target)) setSearchResults([]);
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -86,6 +78,7 @@ const Header = () => {
   const handleSelectMovie = (id, type) => {
     setSearchTerm("");
     setSearchResults([]);
+    setMenuOpen(false); // close mobile menu if open
     navigate(`/movie/${type}/${id}`);
   };
 
@@ -104,7 +97,7 @@ const Header = () => {
           <button onClick={() => navigate("/series")} className="text-white hover:text-red-500">Series</button>
           <button onClick={() => navigate("/anime")} className="text-white hover:text-red-500">Anime</button>
 
-          {/* Netflix-style Search */}
+          {/* Search */}
           <div ref={searchRef} className="relative w-72">
             <div className="flex items-center bg-[#333] rounded-lg overflow-hidden">
               <input
@@ -200,26 +193,29 @@ const Header = () => {
           <button onClick={() => { navigate("/series"); setMenuOpen(false); }} className="text-white hover:text-red-500">Series</button>
           <button onClick={() => { navigate("/anime"); setMenuOpen(false); }} className="text-white hover:text-red-500">Anime</button>
 
-          <input
-            type="text"
-            placeholder="Search"
-            className="px-2 py-1 bg-[#333] text-white rounded"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          {searchResults.length > 0 && (
-            <div className="flex flex-col bg-black bg-opacity-95 rounded p-1 max-h-40 overflow-y-auto">
-              {searchResults.map((item) => (
-                <button
-                  key={item.id}
-                  className="text-white text-left px-2 py-1 hover:bg-red-600 rounded flex items-center gap-2"
-                  onClick={() => handleSelectMovie(item.id, item.media_type)}
-                >
-                  {item.title || item.name}
-                </button>
-              ))}
-            </div>
-          )}
+          {/* Mobile Search */}
+          <div ref={searchRef} className="relative">
+            <input
+              type="text"
+              placeholder="Search"
+              className="px-2 py-1 bg-[#333] text-white rounded w-full"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            {searchResults.length > 0 && (
+              <div className="absolute top-10 left-0 w-full bg-black bg-opacity-95 border border-gray-700 rounded-lg shadow-lg p-2 flex flex-col space-y-1 max-h-40 overflow-y-auto z-50">
+                {searchResults.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => handleSelectMovie(item.id, item.media_type)}
+                    className="text-white text-left px-2 py-1 hover:bg-red-600 rounded flex items-center gap-2"
+                  >
+                    {item.title || item.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
           {showGpt && (
             <select className="p-2 bg-[#e50914] text-white rounded" onChange={langChange}>
@@ -230,7 +226,7 @@ const Header = () => {
           )}
 
           <button className="bg-[#e50914] rounded-lg py-2 px-3 text-white font-semibold hover:bg-red-600 transition" onClick={handleGPT}>
-            {showGpt ? "Go Back" : "Get what you like"}
+            {showGpt ? "Go Back" : "Ai Picks for You"}
           </button>
 
           <hr className="border-gray-700" />
