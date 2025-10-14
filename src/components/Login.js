@@ -1,11 +1,21 @@
 import { useState, useRef } from "react";
 import Header from "./Header";
 import { checkValid } from "../utils/validate";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile,
+  GoogleAuthProvider,
+  FacebookAuthProvider,
+  GithubAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
 import { auth } from "../utils/firebase";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
+import { FcGoogle } from "react-icons/fc";
+import { FaFacebookF, FaGithub } from "react-icons/fa";
 
 const Login = () => {
   const [isSignIn, setIsSignIn] = useState(true);
@@ -28,8 +38,8 @@ const Login = () => {
           const user = userCredential.user;
           updateProfile(user, { displayName: name.current.value })
             .then(() => {
-              const { uid, email, displayName } = auth.currentUser;
-              dispatch(addUser({ uid, email, displayName }));
+              const { uid, email, displayName, photoURL } = auth.currentUser;
+              dispatch(addUser({ uid, email, displayName, photoURL }));
               navigate("/browse"); // redirect after signup
             })
             .catch(console.error);
@@ -50,8 +60,42 @@ const Login = () => {
     setErrMsg([]);
   };
 
+  // Social login handlers
+  const handleGoogleLogin = () => {
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        const { uid, displayName, email, photoURL } = result.user;
+        dispatch(addUser({ uid, displayName, email, photoURL }));
+        navigate("/browse");
+      })
+      .catch((error) => setErrMsg([error.message]));
+  };
+
+  const handleFacebookLogin = () => {
+    const provider = new FacebookAuthProvider();
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        const { uid, displayName, email, photoURL } = result.user;
+        dispatch(addUser({ uid, displayName, email, photoURL }));
+        navigate("/browse");
+      })
+      .catch((error) => setErrMsg([error.message]));
+  };
+
+  const handleGithubLogin = () => {
+    const provider = new GithubAuthProvider();
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        const { uid, displayName, email, photoURL } = result.user;
+        dispatch(addUser({ uid, displayName, email, photoURL }));
+        navigate("/browse");
+      })
+      .catch((error) => setErrMsg([error.message]));
+  };
+
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen bg-black">
       <Header />
       <div
         className="absolute inset-0 bg-cover bg-center z-0"
@@ -93,7 +137,7 @@ const Login = () => {
             className="p-4 mb-2 w-full bg-gray-800 rounded focus:outline-none focus:ring-2 focus:ring-[#e50914]"
           />
 
-          {/* Display validation messages as checklist */}
+          {/* Display validation messages */}
           {errMsg.length > 0 && (
             <ul className="text-[#e50914] mb-4 list-disc list-inside text-sm sm:text-base">
               {errMsg.map((msg, idx) => (
@@ -109,10 +153,40 @@ const Login = () => {
             {isSignIn ? "Sign In" : "Sign Up"}
           </button>
 
-          <p className="text-center text-sm sm:text-base">
+          <div className="flex items-center my-4">
+            <hr className="flex-1 border-gray-700" />
+            <span className="mx-2 text-gray-400 text-sm">OR</span>
+            <hr className="flex-1 border-gray-700" />
+          </div>
+
+          {/* Social Login Buttons */}
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={handleGoogleLogin}
+              className="w-full py-3 bg-white text-black rounded-lg flex items-center justify-center gap-2 hover:bg-gray-200 transition"
+            >
+              <FcGoogle size={24} /> Sign in with Google
+            </button>
+
+            <button
+              onClick={handleFacebookLogin}
+              className="w-full py-3 bg-blue-600 text-white rounded-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition"
+            >
+              <FaFacebookF size={20} /> Sign in with Facebook
+            </button>
+
+            <button
+              onClick={handleGithubLogin}
+              className="w-full py-3 bg-gray-800 text-white rounded-lg flex items-center justify-center gap-2 hover:bg-gray-900 transition"
+            >
+              <FaGithub size={20} /> Sign in with GitHub
+            </button>
+          </div>
+
+          <p className="text-center text-sm sm:text-base mt-4">
             {isSignIn ? (
               <>
-                New to Netflix-GPT?{" "}
+                New to MovieMate?{" "}
                 <span
                   className="cursor-pointer text-white font-bold hover:underline"
                   onClick={toggleForm}
