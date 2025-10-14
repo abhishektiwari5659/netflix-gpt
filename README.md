@@ -1,4 +1,4 @@
-# Netflix-GPT 🎬🤖  
+# MovieMate 🎬🤖  
 
 [![React](https://img.shields.io/badge/React-18.0-blue?logo=react)](https://react.dev/)  
 [![Redux](https://img.shields.io/badge/Redux-Toolkit-764ABC?logo=redux)](https://redux-toolkit.js.org/)  
@@ -10,15 +10,15 @@
 [![Repo Size](https://img.shields.io/github/repo-size/abhishektiwari5659/netflix-gpt)](https://github.com/abhishektiwari5659/netflix-gpt)  
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)  
 
-🔗 **Live Demo:** [Netflix-GPT on Vercel](https://moviemate-opal.vercel.app/)  
+🔗 **Live Demo:** [MovieMate on Vercel](https://moviemate-opal.vercel.app/)  
 
 ---
 
 ## 📖 Description  
 
-**Netflix-GPT**  
+**MovieMate**  
 
-Netflix-GPT is a **Netflix-inspired web application** enhanced with AI.  
+MovieMate is a **Netflix-inspired web application** enhanced with AI.  
 It combines **Firebase authentication, Redux state management, TMDB APIs, and Google Gemini (AI)** to deliver a personalized movie discovery experience.  
 
 Users can **sign up, log in, browse trending titles, view trailers, see cast info, and even type in what they want to watch**—where Gemini AI suggests **movies tailored to their preferences**.  
