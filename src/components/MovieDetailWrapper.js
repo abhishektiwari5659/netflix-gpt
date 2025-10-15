@@ -1,26 +1,38 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import MovieDetail from "./MovieDetail";
 import CastDetail from "./CastDetail";
 
 const MovieDetailWrapper = () => {
-  const { id, type } = useParams(); 
+  const { id, type } = useParams();
   const navigate = useNavigate();
 
   const [selectedMovie, setSelectedMovie] = useState({ id, type });
   const [selectedCast, setSelectedCast] = useState(null);
 
-  // If cast is selected, show CastDetail instead
+  // Update selectedMovie whenever URL params change
+  useEffect(() => {
+    if (id && type) {
+      setSelectedMovie({ id, type });
+      setSelectedCast(null);
+    }
+  }, [id, type]);
+
+  // 🧩 When cast selected, show CastDetail
   if (selectedCast) {
     return (
       <CastDetail
         personId={selectedCast.id}
-        onBack={() => setSelectedCast(null)} // go back to movie details
-        onSelectMovie={(id, type) => setSelectedMovie({ id, type })} // navigate to another movie
+        onBack={() => setSelectedCast(null)} // go back to movie detail
+        onSelectMovie={(movieId, movieType) => {
+          setSelectedCast(null);
+          navigate(`/movie/${movieType}/${movieId}`);
+        }}
       />
     );
   }
 
+  // ❌ Safety check
   if (!selectedMovie) {
     return (
       <div className="text-white text-center mt-20">
@@ -35,13 +47,16 @@ const MovieDetailWrapper = () => {
     );
   }
 
+  // 🎬 Movie detail page
   return (
     <MovieDetail
       movieId={selectedMovie.id}
       type={selectedMovie.type}
       onBack={() => navigate(-1)}
-      onSelectMovie={(id, type) => setSelectedMovie({ id, type })}
-      onSelectCast={(id) => setSelectedCast({ id })}
+      onSelectMovie={(movieId, movieType) =>
+        navigate(`/movie/${movieType}/${movieId}`)
+      }
+      onSelectCast={(castId) => setSelectedCast({ id: castId })}
     />
   );
 };
