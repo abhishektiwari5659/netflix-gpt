@@ -6,7 +6,6 @@ import {
   signInWithEmailAndPassword,
   updateProfile,
   GoogleAuthProvider,
-  FacebookAuthProvider,
   GithubAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
@@ -15,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { FcGoogle } from "react-icons/fc";
-import { FaFacebookF, FaGithub } from "react-icons/fa";
+import { FaGithub } from "react-icons/fa";
 
 const Login = () => {
   const [isSignIn, setIsSignIn] = useState(true);
@@ -60,7 +59,7 @@ const Login = () => {
     setErrMsg([]);
   };
 
-  // Social login handlers
+  // Google login handler
   const handleGoogleLogin = () => {
     const provider = new GoogleAuthProvider();
     signInWithPopup(auth, provider)
@@ -72,17 +71,7 @@ const Login = () => {
       .catch((error) => setErrMsg([error.message]));
   };
 
-  const handleFacebookLogin = () => {
-    const provider = new FacebookAuthProvider();
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        const { uid, displayName, email, photoURL } = result.user;
-        dispatch(addUser({ uid, displayName, email, photoURL }));
-        navigate("/browse");
-      })
-      .catch((error) => setErrMsg([error.message]));
-  };
-
+  // GitHub login handler
   const handleGithubLogin = () => {
     const provider = new GithubAuthProvider();
     signInWithPopup(auth, provider)
@@ -166,13 +155,6 @@ const Login = () => {
               className="w-full py-3 bg-white text-black rounded-lg flex items-center justify-center gap-2 hover:bg-gray-200 transition"
             >
               <FcGoogle size={24} /> Sign in with Google
-            </button>
-
-            <button
-              onClick={handleFacebookLogin}
-              className="w-full py-3 bg-blue-600 text-white rounded-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition"
-            >
-              <FaFacebookF size={20} /> Sign in with Facebook
             </button>
 
             <button
