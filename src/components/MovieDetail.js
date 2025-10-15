@@ -86,21 +86,24 @@ const MovieDetail = ({ movieId, type = "movie", onBack, onSelectMovie, onSelectC
     </button>
 
     {/* Player */}
-    {showPlayer && imdbId ? (
-      <iframe
-        src={`https://vidsrc.to/embed/${type}/${imdbId}`}
-        allowFullScreen
-        className="w-[90vw] h-[80vh] rounded-xl shadow-2xl transition-transform duration-500 scale-100"
-      ></iframe>
-    ) : (
-      currentVideoKey && (
-        <iframe
-          src={`https://www.youtube.com/embed/${currentVideoKey}?autoplay=1&mute=0&controls=1`}
-          allowFullScreen
-          className="w-[90vw] h-[80vh] rounded-xl shadow-2xl transition-transform duration-500 scale-100"
-        ></iframe>
-      )
-    )}
+{showPlayer && imdbId ? (
+  <iframe
+    title={`${type} - Video Player`} // Dynamic title
+    src={`https://vidsrc.to/embed/${type}/${imdbId}`}
+    allowFullScreen
+    className="w-[90vw] h-[80vh] rounded-xl shadow-2xl transition-transform duration-500 scale-100"
+  ></iframe>
+) : (
+  currentVideoKey && (
+    <iframe
+      title={`YouTube Video - ${currentVideoKey}`} // Dynamic title
+      src={`https://www.youtube.com/embed/${currentVideoKey}?autoplay=1&mute=0&controls=1`}
+      allowFullScreen
+      className="w-[90vw] h-[80vh] rounded-xl shadow-2xl transition-transform duration-500 scale-100"
+    ></iframe>
+  )
+)}
+
   </div>
 )}
 

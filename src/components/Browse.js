@@ -30,9 +30,6 @@ const Browse = () => {
     navigate(`/movie/${type}/${id}`);
   };
 
-  const handleCastSelect = (id) => {
-    navigate(`/cast/${id}`);
-  };
 
   return (
     <div className="text-white min-h-screen bg-black">
