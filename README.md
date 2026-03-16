@@ -121,7 +121,6 @@ npm start
 - 📌 **User Watchlist & Favorites** – Save movies to your account  
 - 📌 **AI-powered Summaries & Smart Trailers** with Gemini  
 - 📌 **Improved Multi-language support** across the entire app  
-- 📌 **Social Sharing** – Share favorite movies/recommendations with friends  
 - 📌 **Personalized Profiles** – Multiple users per account (like Netflix profiles)  
 
 ---
